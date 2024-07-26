@@ -63,7 +63,7 @@ class MainActivity: FlutterActivity() {
         return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
     }
 
-   private fun fetchBatteryInfo(): String {
+      private fun fetchBatteryInfo(): String {
         val batteryManager = getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         val batteryChargeCounter = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
@@ -72,12 +72,15 @@ class MainActivity: FlutterActivity() {
         val batteryEnergyCounter = batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)
         val batteryHealth = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
         val batteryStatus = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
-        val isCharging = batteryManager.isCharging
+        val isCharging = batteryManager.isCharging()
+        val chargeTimeRemaining = batteryManager.computeChargeTimeRemaining()
 
         val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         val batteryStatusIntent = registerReceiver(null, intentFilter)
         val batteryVoltage = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
         val batteryTemperature = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+        val batteryPlugged = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+        val batteryTechnology = batteryStatusIntent?.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)
 
         val batteryInfo = mapOf(
             "Battery Level" to "$batteryLevel%",
@@ -89,7 +92,10 @@ class MainActivity: FlutterActivity() {
             "Battery Voltage" to "$batteryVoltage mV",
             "Battery Temperature" to "${batteryTemperature?.div(10.0)} °C",
             "Battery Status" to getBatteryStatusString(batteryStatus),
-            "Is Charging" to isCharging.toString()
+            "Is Charging" to isCharging.toString(),
+            "Charge Time Remaining" to "${chargeTimeRemaining / 60} minutes",
+            "Battery Plugged" to getBatteryPluggedString(batteryPlugged),
+            "Battery Technology" to batteryTechnology
         )
         return JSONObject(batteryInfo).toString()
     }
@@ -114,6 +120,15 @@ class MainActivity: FlutterActivity() {
             BatteryManager.BATTERY_STATUS_FULL -> "Full"
             BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not Charging"
             BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
+            else -> "Unknown"
+        }
+    }
+
+    private fun getBatteryPluggedString(plugged: Int?): String {
+        return when (plugged) {
+            BatteryManager.BATTERY_PLUGGED_AC -> "AC"
+            BatteryManager.BATTERY_PLUGGED_USB -> "USB"
+            BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Wireless"
             else -> "Unknown"
         }
     }

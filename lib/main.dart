@@ -73,12 +73,12 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
 
     setState(() {
       _deviceId = deviceId;
-      _batteryInfo = batteryInfo;
       _ramInfo = ramInfo;
       _cpuInfo = cpuInfo;
       _cameraInfo = cameraInfo;
       _manufacturerInfo = manufacturerInfo;
       _versionInfo = versionInfo;
+      _batteryInfo = batteryInfo;
     });
   }
 
@@ -110,39 +110,12 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 const SizedBox(height: 10,),
                 const Text('Manufacture Info:- ', style: TextStyle(fontWeight: FontWeight.bold),),
 
-                Text('MANUFACTURER: ${_manufacturerInfo['MANUFACTURER']}'),
-                Text('MODEL: ${_manufacturerInfo['MODEL']}'),
-                Text('BOARD: ${_manufacturerInfo['BOARD']}'),
-                Text('BOOTLOADER: ${_manufacturerInfo['BOOTLOADER']}'),
-                Text('BRAND: ${_manufacturerInfo['BRAND']}'),
-                Text('DEVICE: ${_manufacturerInfo['DEVICE']}'),
-                Text('DISPLAY: ${_manufacturerInfo['DISPLAY']}'),
-                Text('FINGERPRINT: ${_manufacturerInfo['FINGERPRINT']}'),
-                Text('HARDWARE: ${_manufacturerInfo['HARDWARE']}'),
-                Text('HOST: ${_manufacturerInfo['HOST']}'),
-                Text('ID: ${_manufacturerInfo['ID']}'),
-                Text('PRODUCT: ${_manufacturerInfo['PRODUCT']}'),
-                Text('TAGS: ${_manufacturerInfo['TAGS']}'),
-                Text('TIME: ${_manufacturerInfo['TIME']}'),
-                Text('TYPE: ${_manufacturerInfo['TYPE']}'),
-                Text('USER: ${_manufacturerInfo['USER']}'),
-                Text('RADIO: ${_manufacturerInfo['RADIO']}'),
-                Text('SERIAL: ${_manufacturerInfo['SERIAL']}'),
-                Text('SUPPORTED_32_BIT_ABIS: ${_manufacturerInfo['SUPPORTED_32_BIT_ABIS']}'),
-                Text('SUPPORTED_64_BIT_ABIS: ${_manufacturerInfo['SUPPORTED_64_BIT_ABIS']}'),
-                Text('SUPPORTED_ABIS: ${_manufacturerInfo['SUPPORTED_ABIS']}'),
+                ..._manufacturerInfo.entries.map((entry) => Text('${entry.key}: ${entry.value}')).toList(),
 
                 // %%%%%%%%%%%%%%%%%%%%%%%
                 const SizedBox(height: 10,),
                 const Text('Version Info:- ', style: TextStyle(fontWeight: FontWeight.bold),),
-                Text('BASE_OS: ${_versionInfo['BASE_OS']}'),
-                Text('CODENAME: ${_versionInfo['CODENAME']}'),
-                Text('INCREMENTAL: ${_versionInfo['INCREMENTAL']}'),
-                Text('PREVIEW_SDK_INT: ${_versionInfo['PREVIEW_SDK_INT']}'),
-                Text('RELEASE: ${_versionInfo['RELEASE']}'),
-                Text('SDK: ${_versionInfo['SDK']}'),
-                Text('SDK_INT: ${_versionInfo['SDK_INT']}'),
-                Text('SECURITY_PATCH: ${_versionInfo['SECURITY_PATCH']}'),
+                ..._versionInfo.entries.map((entry) => Text('${entry.key}: ${entry.value}')).toList(),
 
                 // %%%%%%%%%%%%%%%%%%%%%%%
                 const SizedBox(height: 10,),
