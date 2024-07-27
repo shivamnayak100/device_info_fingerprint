@@ -1,22 +1,15 @@
 package com.example.device_info
 
-import android.os.Build
-import android.provider.Settings
-import android.os.Bundle
 import android.content.Context
-import android.os.Environment
-import android.os.StatFs
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.os.Build
+import android.provider.Settings
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
-import android.os.BatteryManager
-import android.content.Intent
-import android.content.IntentFilter
 
 
 class MainActivity: FlutterActivity() {
@@ -51,7 +44,7 @@ class MainActivity: FlutterActivity() {
                     result.success(versionInfo)
                 }
                 "getBatteryInfo" -> {
-                    val batteryInfo = fetchBatteryInfo()
+                    val batteryInfo = fetchBatteryInfo(this)
                     result.success(batteryInfo)
                 }
                 else -> result.notImplemented()
@@ -62,76 +55,7 @@ class MainActivity: FlutterActivity() {
     private fun fetchDeviceId(): String {
         return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
     }
-
-      private fun fetchBatteryInfo(): String {
-        val batteryManager = getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-        val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        val batteryChargeCounter = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
-        val batteryCurrentAverage = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE)
-        val batteryCurrentNow = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
-        val batteryEnergyCounter = batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)
-        val batteryHealth = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
-        val batteryStatus = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS)
-        val isCharging = batteryManager.isCharging()
-        val chargeTimeRemaining = batteryManager.computeChargeTimeRemaining()
-
-        val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        val batteryStatusIntent = registerReceiver(null, intentFilter)
-        val batteryVoltage = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
-        val batteryTemperature = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
-        val batteryPlugged = batteryStatusIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-        val batteryTechnology = batteryStatusIntent?.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)
-
-        val batteryInfo = mapOf(
-            "Battery Level" to "$batteryLevel%",
-            "Battery Charge Counter" to "$batteryChargeCounter",
-            "Battery Current Average" to "$batteryCurrentAverage µA",
-            "Battery Current Now" to "$batteryCurrentNow µA",
-            "Battery Energy Counter" to "$batteryEnergyCounter nWh",
-            "Battery Health" to getBatteryHealthString(batteryHealth),
-            "Battery Voltage" to "$batteryVoltage mV",
-            "Battery Temperature" to "${batteryTemperature?.div(10.0)} °C",
-            "Battery Status" to getBatteryStatusString(batteryStatus),
-            "Is Charging" to isCharging.toString(),
-            "Charge Time Remaining" to "${chargeTimeRemaining / 60} minutes",
-            "Battery Plugged" to getBatteryPluggedString(batteryPlugged),
-            "Battery Technology" to batteryTechnology
-        )
-        return JSONObject(batteryInfo).toString()
-    }
-
-    private fun getBatteryHealthString(health: Int): String {
-        return when (health) {
-            BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
-            BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
-            BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
-            BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
-            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Over Voltage"
-            BatteryManager.BATTERY_HEALTH_UNKNOWN -> "Unknown"
-            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified Failure"
-            else -> "Unknown"
-        }
-    }
-
-    private fun getBatteryStatusString(status: Int): String {
-        return when (status) {
-            BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
-            BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
-            BatteryManager.BATTERY_STATUS_FULL -> "Full"
-            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not Charging"
-            BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
-            else -> "Unknown"
-        }
-    }
-
-    private fun getBatteryPluggedString(plugged: Int?): String {
-        return when (plugged) {
-            BatteryManager.BATTERY_PLUGGED_AC -> "AC"
-            BatteryManager.BATTERY_PLUGGED_USB -> "USB"
-            BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Wireless"
-            else -> "Unknown"
-        }
-    }
+    
 
     private fun fetchRamInfo(): String {
         val memInfo = android.app.ActivityManager.MemoryInfo()
