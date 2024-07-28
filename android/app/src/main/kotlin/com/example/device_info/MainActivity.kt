@@ -15,6 +15,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.util.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 
 
@@ -57,10 +62,43 @@ class MainActivity: FlutterActivity() {
                     val systemInfo =  SystemInfoHelper.fetchSystemInfo(contentResolver)
                     result.success(systemInfo)
                 }
+                "getPrivateIPAddress" -> {
+                    val privateIP = getPrivateIPAddress()
+                    result.success(privateIP)
+                }
+                // "getPublicIPAddress" -> {
+                //     val publicIP = getPublicIPAddress()
+                //     result.success(publicIP)
+                // }
                 else -> result.notImplemented()
             }
         }
     }
+
+
+    // This is for geting Private IP of user
+    private fun getPrivateIPAddress(): String? {
+        try {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+                val inetAddresses = networkInterface.inetAddresses
+                while (inetAddresses.hasMoreElements()) {
+                    val inetAddress = inetAddresses.nextElement()
+                    if (!inetAddress.isLoopbackAddress && inetAddress is InetAddress) {
+                        val ipAddress = inetAddress.hostAddress
+                        if (inetAddress.isSiteLocalAddress) {
+                            return ipAddress
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
 
     private fun fetchDeviceId(): String {
         return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -87,7 +125,7 @@ class MainActivity: FlutterActivity() {
         return "Cameras: $cameras"
     }
 
-    // ********************************************* //
+    // This is for device build information
     private fun fetchBuildVersionInfo(): String {
         val versionInfo = mapOf(
             "BASE_OS" to Build.VERSION.BASE_OS,

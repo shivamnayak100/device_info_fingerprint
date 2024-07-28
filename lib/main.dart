@@ -30,6 +30,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   Map<String, String> _batteryInfo = {};
   Map<String, String> _deviceSettingModeInfo = {};
   Map<String, String> _systemInfo = {};
+  String _privateIP = "Unknown";
 
   Future<void> _getDeviceInfo() async {
     try {
@@ -41,7 +42,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       final String batteryInfoResult = await platform.invokeMethod('getBatteryInfo');
       final String deviceSettingInfoResult = await platform.invokeMethod('getDeviceModeInfo');
       final String systemInfoResult = await platform.invokeMethod('getSystemInfo');
-
+      final String privateIpResult = await platform.invokeMethod('getPrivateIPAddress');
       setState(() {
         _deviceId = 'Device ID: $deviceId';
         _ramInfo = ramInfo;
@@ -51,6 +52,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
         _batteryInfo = Map<String, String>.from(json.decode(batteryInfoResult));
         _deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
         _systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
+        _privateIP = privateIpResult;
       });
     } on PlatformException catch (e) {
       setState(() {
@@ -62,6 +64,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
         _batteryInfo = {'Error': '${e.message}'};
         _deviceSettingModeInfo = {'Error': '${e.message}'};
         _systemInfo = {'Error': '${e.message}'};
+        _privateIP = "Failed to get private IP address: '${e.message}'.";
       });
     }
   }
@@ -88,6 +91,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 Text(_deviceId),
                 Text(_ramInfo),
                 Text(_cameraInfo),
+                 Text('Private IP Address: $_privateIP'),
 
                 // %%%%%%%%%%%%%%%%%%%%%%%
                 const SizedBox(height: 10,),
