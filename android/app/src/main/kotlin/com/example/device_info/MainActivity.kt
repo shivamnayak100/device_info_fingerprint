@@ -10,6 +10,10 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
 class MainActivity: FlutterActivity() {
@@ -46,6 +50,14 @@ class MainActivity: FlutterActivity() {
                 "getBatteryInfo" -> {
                     val batteryInfo = fetchBatteryInfo(this)
                     result.success(batteryInfo)
+                }
+                "getDeviceModeInfo" -> {
+                    val deviceSettingModeInfo = DeviceSettingsHelper.fetchDeviceSettingInfo(contentResolver)
+                    result.success(deviceSettingModeInfo)
+                }
+                "getModeStatusInfo" -> {
+                    val modeStatusInfo = fetchModeStatusInfo()
+                    result.success(modeStatusInfo)
                 }
                 else -> result.notImplemented()
             }
@@ -124,4 +136,10 @@ class MainActivity: FlutterActivity() {
         )
         return JSONObject(versionInfo).toString()
     }
+
+    private fun fetchModeStatusInfo(): Boolean {
+        return Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
+    }
+
+    
 }
