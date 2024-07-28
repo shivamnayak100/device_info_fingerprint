@@ -20,6 +20,10 @@ import java.net.NetworkInterface
 import java.util.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
+import android.os.AsyncTask
 
 
 
@@ -66,10 +70,9 @@ class MainActivity: FlutterActivity() {
                     val privateIP = getPrivateIPAddress()
                     result.success(privateIP)
                 }
-                // "getPublicIPAddress" -> {
-                //     val publicIP = getPublicIPAddress()
-                //     result.success(publicIP)
-                // }
+                "getPublicIPAddress" -> {
+                    GetPublicIPAddressTask(result).execute()
+                }
                 else -> result.notImplemented()
             }
         }
@@ -97,6 +100,36 @@ class MainActivity: FlutterActivity() {
             e.printStackTrace()
         }
         return null
+    }
+
+    // This is for geting Public IP
+
+    private class GetPublicIPAddressTask(private val result: MethodChannel.Result) : AsyncTask<Void, Void, String?>() {
+        override fun doInBackground(vararg params: Void?): String? {
+            return try {
+                val url = URL("https://api.ipify.org?format=text")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                connection.connect()
+
+                if (connection.responseCode == 200) {
+                    val inputStream = connection.inputStream
+                    val response = inputStream.bufferedReader().use { it.readText() }
+                    response
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+        override fun onPostExecute(result: String?) {
+            this.result.success(result)
+        }
     }
 
 

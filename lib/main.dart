@@ -25,46 +25,50 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   String _deviceId = "Unknown";
   String _ramInfo = 'Unknown';
   String _cameraInfo = 'Unknown';
+  String _privateIP = "Unknown";
+  String _publicIP = "Unknown";
   Map<String, String> _manufacturerInfo = {};
   Map<String, String> _versionInfo = {};
   Map<String, String> _batteryInfo = {};
   Map<String, String> _deviceSettingModeInfo = {};
   Map<String, String> _systemInfo = {};
-  String _privateIP = "Unknown";
 
   Future<void> _getDeviceInfo() async {
     try {
       final String deviceId = await platform.invokeMethod('getDeviceInfo');
       final String ramInfo = await platform.invokeMethod('getRamInfo');
       final String cameraInfo = await platform.invokeMethod('getCameraInfo');
+      final String privateIpResult = await platform.invokeMethod('getPrivateIPAddress');
+      final String publicIpResult = await platform.invokeMethod('getPublicIPAddress');
       final String manufacturerResult = await platform.invokeMethod('getManufacturerInfo');
       final String versionInfoResult = await platform.invokeMethod('versionInfo');
       final String batteryInfoResult = await platform.invokeMethod('getBatteryInfo');
       final String deviceSettingInfoResult = await platform.invokeMethod('getDeviceModeInfo');
       final String systemInfoResult = await platform.invokeMethod('getSystemInfo');
-      final String privateIpResult = await platform.invokeMethod('getPrivateIPAddress');
       setState(() {
         _deviceId = 'Device ID: $deviceId';
         _ramInfo = ramInfo;
         _cameraInfo = cameraInfo;
+        _privateIP = privateIpResult;
+        _publicIP = publicIpResult;
         _manufacturerInfo = Map<String, String>.from(json.decode(manufacturerResult));
         _versionInfo = Map<String, String>.from(json.decode(versionInfoResult));
         _batteryInfo = Map<String, String>.from(json.decode(batteryInfoResult));
         _deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
         _systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
-        _privateIP = privateIpResult;
       });
     } on PlatformException catch (e) {
       setState(() {
         _deviceId = "Failed to get device info: '${e.message}'.";
         _ramInfo = "Failed to get RAM info: '${e.message}'.";
         _cameraInfo = "Failed to get camera info: '${e.message}'.";
+        _privateIP = "Failed to get private IP address: '${e.message}'.";
+        _publicIP = "Failed to get public IP address: '${e.message}'.";
         _manufacturerInfo = {'Error': '${e.message}'};
         _versionInfo = {'Error': '${e.message}'};
         _batteryInfo = {'Error': '${e.message}'};
         _deviceSettingModeInfo = {'Error': '${e.message}'};
         _systemInfo = {'Error': '${e.message}'};
-        _privateIP = "Failed to get private IP address: '${e.message}'.";
       });
     }
   }
@@ -91,7 +95,8 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 Text(_deviceId),
                 Text(_ramInfo),
                 Text(_cameraInfo),
-                 Text('Private IP Address: $_privateIP'),
+                Text('Private IP Address: $_privateIP'),
+                Text('Public IP Address: $_publicIP'),
 
                 // %%%%%%%%%%%%%%%%%%%%%%%
                 const SizedBox(height: 10,),
