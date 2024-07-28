@@ -30,6 +30,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   Map<String, String> _versionInfo = {};
   Map<String, String> _batteryInfo = {};
   Map<String, String> _deviceSettingModeInfo = {};
+  Map<String, String> _systemInfo = {};
 
   Future<void> _getDeviceInfo() async {
     String deviceId;
@@ -40,6 +41,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
     Map<String, String> versionInfo;
     Map<String, String> batteryInfo;
     Map<String, String> deviceSettingModeInfo;
+    Map<String, String> systemInfo;
     try {
       final String result = await platform.invokeMethod('getDeviceInfo');
       deviceId = 'Device ID: $result';
@@ -66,6 +68,8 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       final String deviceSettingInfoResult = await platform.invokeMethod('getDeviceModeInfo');
       deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
 
+      final String systemInfoResult = await platform.invokeMethod('getSystemInfo');
+      systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
 
     } on PlatformException catch (e) {
       deviceId = "Failed to get device info: '${e.message}'.";
@@ -76,6 +80,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       versionInfo = {"BASE_OS": '${e.message}'};
       batteryInfo = {'Error': "Failed to get battery info: '${e.message}'"};
       deviceSettingModeInfo = {'Error': "Failed to get Device Setting info: '${e.message}'"};
+      systemInfo = {'Error': "Failed to get System Information: '${e.message}'"};
     }
 
     setState(() {
@@ -87,6 +92,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       _versionInfo = versionInfo;
       _batteryInfo = batteryInfo;
       _deviceSettingModeInfo = deviceSettingModeInfo;
+      _systemInfo = systemInfo;
     });
   }
 
@@ -134,6 +140,11 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 const SizedBox(height: 10,),
                 const Text('Device Mode Status Info:- ', style: TextStyle(fontWeight: FontWeight.bold),),
                 ..._deviceSettingModeInfo.entries.map((entry) => Text('${entry.key}: ${entry.value}')).toList(),
+
+                // %%%%%%%%%%%%%%%%%%%%%%%
+                const SizedBox(height: 10,),
+                const Text('Mobile System Info:- ', style: TextStyle(fontWeight: FontWeight.bold),),
+                ..._systemInfo.entries.map((entry) => Text('${entry.key}: ${entry.value}')).toList(),
 
               ],
             ),

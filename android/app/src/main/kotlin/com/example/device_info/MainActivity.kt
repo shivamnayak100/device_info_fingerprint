@@ -6,6 +6,7 @@ import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -14,6 +15,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
 
 
 class MainActivity: FlutterActivity() {
@@ -40,7 +42,7 @@ class MainActivity: FlutterActivity() {
                     result.success(cameraInfo)
                 }
                 "getManufacturerInfo" -> {
-                    val manufacturerInfo = fetchManufacturerInfo()
+                    val manufacturerInfo = DeviceManufactureInfoHelper.fetchManufacturerInfo(contentResolver)
                     result.success(manufacturerInfo)
                 }
                 "versionInfo" -> {
@@ -55,9 +57,9 @@ class MainActivity: FlutterActivity() {
                     val deviceSettingModeInfo = DeviceSettingsHelper.fetchDeviceSettingInfo(contentResolver)
                     result.success(deviceSettingModeInfo)
                 }
-                "getModeStatusInfo" -> {
-                    val modeStatusInfo = fetchModeStatusInfo()
-                    result.success(modeStatusInfo)
+                "getSystemInfo" -> {
+                    val systemInfo =  SystemInfoHelper.fetchSystemInfo(contentResolver)
+                    result.success(systemInfo)
                 }
                 else -> result.notImplemented()
             }
@@ -93,35 +95,6 @@ class MainActivity: FlutterActivity() {
         return "Cameras: $cameras"
     }
 
-    //******************************************** */
-
-    private fun fetchManufacturerInfo(): String {
-        val buildInfo = mapOf(
-            "BOARD" to Build.BOARD,
-            "BOOTLOADER" to Build.BOOTLOADER,
-            "BRAND" to Build.BRAND,
-            "DEVICE" to Build.DEVICE,
-            "DISPLAY" to Build.DISPLAY,
-            "FINGERPRINT" to Build.FINGERPRINT,
-            "HARDWARE" to Build.HARDWARE,
-            "HOST" to Build.HOST,
-            "ID" to Build.ID,
-            "MANUFACTURER" to Build.MANUFACTURER,
-            "MODEL" to Build.MODEL,
-            "PRODUCT" to Build.PRODUCT,
-            "TAGS" to Build.TAGS,
-            "TIME" to Build.TIME.toString(),
-            "TYPE" to Build.TYPE,
-            "USER" to Build.USER,
-            "RADIO" to Build.RADIO,
-            "SERIAL" to Build.SERIAL,
-            "SUPPORTED_32_BIT_ABIS" to Build.SUPPORTED_32_BIT_ABIS.joinToString(", "),
-            "SUPPORTED_64_BIT_ABIS" to Build.SUPPORTED_64_BIT_ABIS.joinToString(", "),
-            "SUPPORTED_ABIS" to Build.SUPPORTED_ABIS.joinToString(", ")
-        )
-        return JSONObject(buildInfo).toString()
-    }
-
     // ********************************************* //
     private fun fetchBuildVersionInfo(): String {
         val versionInfo = mapOf(
@@ -135,10 +108,6 @@ class MainActivity: FlutterActivity() {
             "SECURITY_PATCH" to Build.VERSION.SECURITY_PATCH
         )
         return JSONObject(versionInfo).toString()
-    }
-
-    private fun fetchModeStatusInfo(): Boolean {
-        return Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
     }
 
     
