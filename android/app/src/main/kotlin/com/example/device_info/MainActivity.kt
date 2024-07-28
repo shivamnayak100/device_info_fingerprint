@@ -33,10 +33,6 @@ class MainActivity: FlutterActivity() {
                     val ramInfo = fetchRamInfo()
                     result.success(ramInfo)
                 }
-                "getCpuInfo" -> {
-                    val cpuInfo = fetchCpuInfo()
-                    result.success(cpuInfo)
-                }
                 "getCameraInfo" -> {
                     val cameraInfo = fetchCameraInfo()
                     result.success(cameraInfo)
@@ -78,10 +74,6 @@ class MainActivity: FlutterActivity() {
         val totalRam = memInfo.totalMem / (1024 * 1024)
         val availRam = memInfo.availMem / (1024 * 1024)
         return "Total RAM: ${totalRam}MB, Available RAM: ${availRam}MB"
-    }
-
-    private fun fetchCpuInfo(): String {
-        return Build.HARDWARE
     }
 
     private fun fetchCameraInfo(): String {

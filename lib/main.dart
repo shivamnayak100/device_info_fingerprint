@@ -22,9 +22,8 @@ class DeviceInfoScreen extends StatefulWidget {
 
 class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   static const platform = MethodChannel('device_info');
-  String _deviceId = "Unknow";
+  String _deviceId = "Unknown";
   String _ramInfo = 'Unknown';
-  String _cpuInfo = 'Unknown';
   String _cameraInfo = 'Unknown';
   Map<String, String> _manufacturerInfo = {};
   Map<String, String> _versionInfo = {};
@@ -33,67 +32,38 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   Map<String, String> _systemInfo = {};
 
   Future<void> _getDeviceInfo() async {
-    String deviceId;
-    String ramInfo;
-    String cpuInfo;
-    String cameraInfo;
-    Map<String, String> manufacturerInfo;
-    Map<String, String> versionInfo;
-    Map<String, String> batteryInfo;
-    Map<String, String> deviceSettingModeInfo;
-    Map<String, String> systemInfo;
     try {
-      final String result = await platform.invokeMethod('getDeviceInfo');
-      deviceId = 'Device ID: $result';
-
-
-      final String ramResult = await platform.invokeMethod('getRamInfo');
-      ramInfo = ramResult;
-
-      final String cpuResult = await platform.invokeMethod('getCpuInfo');
-      cpuInfo = cpuResult;
-
-      final String cameraResult = await platform.invokeMethod('getCameraInfo');
-      cameraInfo = cameraResult;
-
+      final String deviceId = await platform.invokeMethod('getDeviceInfo');
+      final String ramInfo = await platform.invokeMethod('getRamInfo');
+      final String cameraInfo = await platform.invokeMethod('getCameraInfo');
       final String manufacturerResult = await platform.invokeMethod('getManufacturerInfo');
-      manufacturerInfo = Map<String, String>.from(json.decode(manufacturerResult));
-
       final String versionInfoResult = await platform.invokeMethod('versionInfo');
-      versionInfo = Map<String, String>.from(json.decode(versionInfoResult));
-
-      final String batterInfoResult = await platform.invokeMethod('getBatteryInfo');
-      batteryInfo = Map<String, String>.from(json.decode(batterInfoResult));
-
+      final String batteryInfoResult = await platform.invokeMethod('getBatteryInfo');
       final String deviceSettingInfoResult = await platform.invokeMethod('getDeviceModeInfo');
-      deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
-
       final String systemInfoResult = await platform.invokeMethod('getSystemInfo');
-      systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
 
+      setState(() {
+        _deviceId = 'Device ID: $deviceId';
+        _ramInfo = ramInfo;
+        _cameraInfo = cameraInfo;
+        _manufacturerInfo = Map<String, String>.from(json.decode(manufacturerResult));
+        _versionInfo = Map<String, String>.from(json.decode(versionInfoResult));
+        _batteryInfo = Map<String, String>.from(json.decode(batteryInfoResult));
+        _deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
+        _systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
+      });
     } on PlatformException catch (e) {
-      deviceId = "Failed to get device info: '${e.message}'.";
-      ramInfo = "Failed to get RAM info: '${e.message}'.";
-      cpuInfo = "Failed to get CPU info: '${e.message}'.";
-      cameraInfo = "Failed to get camera info: '${e.message}'.";
-      manufacturerInfo = {'MANUFACTURER':'${e.message}'};
-      versionInfo = {"BASE_OS": '${e.message}'};
-      batteryInfo = {'Error': "Failed to get battery info: '${e.message}'"};
-      deviceSettingModeInfo = {'Error': "Failed to get Device Setting info: '${e.message}'"};
-      systemInfo = {'Error': "Failed to get System Information: '${e.message}'"};
+      setState(() {
+        _deviceId = "Failed to get device info: '${e.message}'.";
+        _ramInfo = "Failed to get RAM info: '${e.message}'.";
+        _cameraInfo = "Failed to get camera info: '${e.message}'.";
+        _manufacturerInfo = {'Error': '${e.message}'};
+        _versionInfo = {'Error': '${e.message}'};
+        _batteryInfo = {'Error': '${e.message}'};
+        _deviceSettingModeInfo = {'Error': '${e.message}'};
+        _systemInfo = {'Error': '${e.message}'};
+      });
     }
-
-    setState(() {
-      _deviceId = deviceId;
-      _ramInfo = ramInfo;
-      _cpuInfo = cpuInfo;
-      _cameraInfo = cameraInfo;
-      _manufacturerInfo = manufacturerInfo;
-      _versionInfo = versionInfo;
-      _batteryInfo = batteryInfo;
-      _deviceSettingModeInfo = deviceSettingModeInfo;
-      _systemInfo = systemInfo;
-    });
   }
 
   @override
@@ -117,7 +87,6 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 const SizedBox(height: 10,),
                 Text(_deviceId),
                 Text(_ramInfo),
-                Text(_cpuInfo),
                 Text(_cameraInfo),
 
                 // %%%%%%%%%%%%%%%%%%%%%%%
