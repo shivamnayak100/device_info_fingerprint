@@ -32,6 +32,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   Map<String, String> _batteryInfo = {};
   Map<String, String> _deviceSettingModeInfo = {};
   Map<String, String> _systemInfo = {};
+  List<String> _installedAppsList = [];
 
   Future<void> _getDeviceInfo() async {
     try {
@@ -45,6 +46,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       final String batteryInfoResult = await platform.invokeMethod('getBatteryInfo');
       final String deviceSettingInfoResult = await platform.invokeMethod('getDeviceModeInfo');
       final String systemInfoResult = await platform.invokeMethod('getSystemInfo');
+      final List<dynamic> installedAppListResult = await platform.invokeMethod('getInstalledApps');
       setState(() {
         _deviceId = 'Device ID: $deviceId';
         _ramInfo = ramInfo;
@@ -56,6 +58,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
         _batteryInfo = Map<String, String>.from(json.decode(batteryInfoResult));
         _deviceSettingModeInfo = Map<String, String>.from(json.decode(deviceSettingInfoResult));
         _systemInfo = Map<String, String>.from(json.decode(systemInfoResult));
+        _installedAppsList = installedAppListResult.cast<String>();
       });
     } on PlatformException catch (e) {
       setState(() {
@@ -69,6 +72,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
         _batteryInfo = {'Error': '${e.message}'};
         _deviceSettingModeInfo = {'Error': '${e.message}'};
         _systemInfo = {'Error': '${e.message}'};
+        _installedAppsList = [];
       });
     }
   }
@@ -123,6 +127,18 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
                 const SizedBox(height: 10,),
                 const Text('Mobile System Info:- ', style: TextStyle(fontWeight: FontWeight.bold),),
                 ..._systemInfo.entries.map((entry) => Text('${entry.key}: ${entry.value}')).toList(),
+
+                // %%%%%%%%%%%%%%%%%%%%%%%
+                const SizedBox(height: 10,),
+                const Text('Installed Apps List:- ', style: TextStyle(fontWeight: FontWeight.bold),),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: _installedAppsList.length,
+                  itemBuilder: (context, index) {
+                    return Text(_installedAppsList[index]);
+                  },
+                ),
 
               ],
             ),

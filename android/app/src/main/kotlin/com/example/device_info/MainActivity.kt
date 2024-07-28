@@ -24,6 +24,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 import android.os.AsyncTask
+import android.content.pm.ApplicationInfo
 
 
 
@@ -73,9 +74,29 @@ class MainActivity: FlutterActivity() {
                 "getPublicIPAddress" -> {
                     GetPublicIPAddressTask(result).execute()
                 }
+                "getInstalledApps" -> {
+                    val apps = getInstalledApps()
+                    result.success(apps)
+                }
                 else -> result.notImplemented()
             }
         }
+    }
+
+
+    // This is for getting all Installed app list
+
+    private fun getInstalledApps(): List<String> {
+        val pm: PackageManager = packageManager
+        val packages: List<ApplicationInfo> = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+        val installedApps = mutableListOf<String>()
+
+        for (packageInfo in packages) {
+            if (packageInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
+                installedApps.add(packageInfo.packageName)
+            }
+        }
+        return installedApps
     }
 
 
